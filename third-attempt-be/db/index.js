@@ -13,13 +13,16 @@ const mongoose = require("mongoose");
 const app = express();
 
 // connect to my MongoDB database
-mongoose.connect(
-  "mongodb+srv://reactors:Northcoders123@cluster0.ndnpdfj.mongodb.net/test",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose
+  .connect(
+    "mongodb+srv://reactors:Northcoders123@cluster0.ndnpdfj.mongodb.net/test",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => console.log("Database connected"))
+  .catch((error) => console.log(`Error connecting to database: ${error}`));
 
 // Define the schema for the files
 const fileSchema = new mongoose.Schema({
@@ -28,8 +31,35 @@ const fileSchema = new mongoose.Schema({
   url: String,
 });
 
-// Create a model from the schema
+// Create a file model from the schema
 const File = mongoose.model("File", fileSchema);
+
+// Define the schema for the users
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  created_at: {
+    type: Date,
+    default: Date.now,
+  },
+  updated_at: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const User = mongoose.model("User", userSchema);
 
 // Allow all requests from any domain
 app.use(cors());
