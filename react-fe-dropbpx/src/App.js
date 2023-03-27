@@ -23,7 +23,7 @@ function App() {
     axios
       .post("http://localhost:9090/api/upload", formData, {
         headers: {
-          Authorization: `Bearer sl.BbVD2iM0GGQyvkGMYfcJPpWumOBrJyv3CDLSztEl7VaMHBnd7vk8JYZaQW1rYf7SR6uuUbvnd4xBgaJfMhOJasssoRjCmXw3D9UQiipx0Tqpu0H644lKQ3DIISbZ3dx6GiZhBpQP`,
+          Authorization: `Bearer sl.BbUEH38Nq2da5dwbcklIb6MI6FcidIrHDhcG_tVS5lmiEOs9LZCXpH1FgKysR5Pgn9ffHm7OlVX9pflbc6tnYatkJQspanNrEwG36mqpEoXY6UUbqWY2my0bCHPtYOY6FSCWq3Dee7A`,
         },
       })
       .then((response) => {

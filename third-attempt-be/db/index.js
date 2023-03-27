@@ -12,7 +12,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-// connect to MongoDB
+// connect to my MongoDB database
 mongoose.connect(
   "mongodb+srv://reactors:Northcoders123@cluster0.ndnpdfj.mongodb.net/test",
   {
@@ -47,7 +47,7 @@ const upload = multer({ dest: "uploads/" });
 
 const dbx = new Dropbox({
   accessToken:
-    "sl.BbV5Ik_iC5QE_SrP-96Awig3yXpKDvN9ybjn6NLGU2S2-XOW1837VLqc15dfuu7fSpPb80gpb50rJMLMzuo8YYkuOHsxqmzTXZduVdNh2sqnttjd7GRI_cagCPMLYcmAwUCBjrOd",
+    "sl.BbUEH38Nq2da5dwbcklIb6MI6FcidIrHDhcG_tVS5lmiEOs9LZCXpH1FgKysR5Pgn9ffHm7OlVX9pflbc6tnYatkJQspanNrEwG36mqpEoXY6UUbqWY2my0bCHPtYOY6FSCWq3Dee7A",
 });
 
 app.get("/api/random", (req, res) => {
@@ -57,6 +57,15 @@ app.get("/api/random", (req, res) => {
 app.post("/api/upload", upload.single("file"), (req, res) => {
   const file = req.file;
 
+  // Append a timestamp to the file name
+  const fileNameParts = file.originalname.split(".");
+  const fileNameWithoutExt = fileNameParts
+    .slice(0, fileNameParts.length - 1)
+    .join(".");
+  const fileExt = fileNameParts[fileNameParts.length - 1];
+  const timestamp = new Date().getTime();
+  const newFileName = `${fileNameWithoutExt}-${timestamp}.${fileExt}`;
+
   fs.readFile(file.path, (err, contents) => {
     if (err) {
       console.log(err, "<<< err");
@@ -65,18 +74,18 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 
     dbx
       .filesUpload({
-        path: "/" + file.originalname,
+        path: "/" + newFileName,
         contents: contents,
       })
       .then(async () => {
         const link = await dbx.sharingCreateSharedLinkWithSettings({
-          path: "/" + file.originalname,
+          path: "/" + newFileName,
         });
         const imageUrl = link?.result?.url?.replace("dl=0", "raw=1");
 
         // Create a new File object to store the image URL in MongoDB
         const newFile = new File({
-          filename: file.originalname,
+          filename: newFileName,
           path: file.path,
           url: imageUrl,
         });
@@ -96,34 +105,3 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 
 // Start the server
 app.listen(9090, () => console.log("Server running on port 9090"));
-
-// dbx
-//   .filesUpload({
-//     path: "/" + file.originalname,
-//     contents: contents,
-//   })
-//   .then(() => {
-//     res.set("Content-Type", "application/json");
-//     res.sendStatus(200);
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//     res.sendStatus(500);
-//   });
-
-// try {
-//   // Upload the file to Dropbox
-//   const response = await dbx.filesUpload({
-//     path: "/" + file.originalname,
-//     contents: contents,
-//   });
-
-//    // Save the file information to MongoDB
-//    const newFile = new File({
-//     filename: file.originalname,
-//     path: file.path,
-//     url: response.path_display,
-//   });
-//   await newFile.save();
-
-// }
